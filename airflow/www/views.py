@@ -57,7 +57,7 @@ from airflow.exceptions import AirflowException
 from airflow.executors.executor_loader import ExecutorLoader
 from airflow.jobs.base_job import BaseJob
 from airflow.jobs.scheduler_job import SchedulerJob
-from airflow.models import Connection, DagModel, DagTag, Log, SlaMiss, TaskFail, XCom, errors
+from airflow.models import Connection, DagModel, DagTag, Log, SlaMiss, TaskFail, XCom, errors, flashmessage
 from airflow.models.baseoperator import BaseOperator
 from airflow.models.dagcode import DagCode
 from airflow.models.dagrun import DagRun, DagRunType
@@ -495,6 +495,10 @@ class Airflow(AirflowBaseView):  # noqa: D101  pylint: disable=too-many-public-m
             ]
 
             import_errors = session.query(errors.ImportError).all()
+            flash_messages = session.query(flashmessage.CustomFlashMessage).all()
+
+        for flash_message in flash_messages:
+            flash(flash_message.text, flash_message.category)
 
         for import_error in import_errors:
             flash(
